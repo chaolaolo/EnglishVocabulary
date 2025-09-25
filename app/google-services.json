@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "832055979745",
+    "project_id": "android2025-b2549",
+    "storage_bucket": "android2025-b2549.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:832055979745:android:612562b95034e6596891a0",
+        "android_client_info": {
+          "package_name": "com.example.engvocab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYeeqpzjG0M5umJtxMw43Y1yjMT0K8jMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
