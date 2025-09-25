@@ -60,6 +60,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.engvocab.R
 import com.example.engvocab.data.model.Vocabulary
 import com.example.engvocab.ui.navigation.Screen
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,14 +167,16 @@ fun HomeScreen(
                                 VocabularyCard(
                                     item = vocab,
                                     onClick = {
-                                        navController.navigate(Screen.VocabDetail.route)
-                                        Log.d("HomeScreen", "data of item: $vocab")
+                                        vocab.id?.let { id ->
+                                            val encodedId = URLEncoder.encode(id, StandardCharsets.UTF_8.toString())
+                                            navController.navigate(Screen.VocabDetail.createRoute(encodedId))
+                                        }
                                     },
                                 )
                             }
 
                             // display pagecounts
-                            if (uiState.totalPages > 1) {
+                            if (uiState.vocabularyOnPage.isNotEmpty() || uiState.currentPage > 1) {
                                 item {
                                     Spacer(Modifier.height(10.dp))
                                     PageCounter(

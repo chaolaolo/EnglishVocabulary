@@ -52,6 +52,7 @@
 package com.example.engvocab.data.model
 
 data class Vocabulary(
+    val id: String? = null,
     val word: String? = null,
     val detailUrl: String? = null,
     val level: String? = null,

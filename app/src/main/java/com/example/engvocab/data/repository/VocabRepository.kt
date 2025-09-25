@@ -10,4 +10,15 @@ class VocabRepository(
     suspend fun getVocabularyList(): List<Vocabulary> {
         return firestoreService.getAllVocabulary()
     }
+
+    suspend fun getVocabularyPage(
+        pageSize: Long,
+        lastWordInPreviousPage: String? = null
+    ): List<Vocabulary> {
+        return firestoreService.getVocabularyPage(pageSize, lastWordInPreviousPage)
+    }
+
+    suspend fun getVocabularyById(id: String): Vocabulary? {
+        return firestoreService.getVocabularyById(id)
+    }
 }
