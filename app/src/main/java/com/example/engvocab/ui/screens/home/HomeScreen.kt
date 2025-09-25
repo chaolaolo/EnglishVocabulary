@@ -60,6 +60,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.engvocab.R
 import com.example.engvocab.data.model.Vocabulary
 import com.example.engvocab.ui.navigation.Screen
+import com.example.engvocab.util.playAudio
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -375,55 +376,3 @@ fun VocabularyCard(
         }
     }
 }
-
-// Hàm xử lý logic phát âm thanh
-fun playAudio(context: Context, exoPlayer: ExoPlayer, audioUrl: String) {
-    try {
-        val mediaItem = MediaItem.fromUri(audioUrl)
-
-        // 1. Dừng player trước khi bắt đầu phát file mới
-        exoPlayer.stop()
-
-        // 2. Cài đặt nguồn dữ liệu
-        exoPlayer.setMediaItem(mediaItem)
-
-        // 3. Chuẩn bị và bắt đầu phát
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = true
-
-        // 4. Lắng nghe sự kiện để thông báo hoặc xử lý lỗi/hoàn thành
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onPlayerError(error: PlaybackException) {
-                super.onPlayerError(error)
-                Log.e("AudioPlayer", "Lỗi phát âm thanh ExoPlayer: ${error.message}")
-                Log.e("AudioPlayer", "Error code: ${error.errorCode}, message: ${error.message}")
-                Toast.makeText(context, "Lỗi: Không thể phát file.", Toast.LENGTH_LONG).show()
-                exoPlayer.removeListener(this) // Gỡ bỏ listener sau khi hoàn thành/lỗi
-            }
-
-            override fun onPlaybackStateChanged(state: Int) {
-                super.onPlaybackStateChanged(state)
-                if (state == Player.STATE_ENDED) {
-                    // Dừng và reset khi hoàn thành
-                    exoPlayer.seekTo(0)
-                    exoPlayer.playWhenReady = false
-                    exoPlayer.removeListener(this) // Gỡ bỏ listener sau khi hoàn thành/lỗi
-                }
-            }
-        })
-
-    } catch (e: Exception) {
-        Log.e("AudioPlayer", "Lỗi cấu hình ExoPlayer: ${e.message}")
-        Toast.makeText(context, "Lỗi phát âm thanh", Toast.LENGTH_SHORT).show()
-    }
-}
-
-// Preview this screen
-//@SuppressLint("ViewModelConstructorInComposable")
-//@Preview(showBackground = true)
-//@Composable
-//fun HomeScreenPreview() {
-//    HomeScreen(
-//        navController = rememberNavController(),
-//    )
-//}
