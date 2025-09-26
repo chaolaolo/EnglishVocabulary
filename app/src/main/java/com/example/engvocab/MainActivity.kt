@@ -16,6 +16,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,17 +34,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.engvocab.ui.navigation.BottomNavGraph
 import com.example.engvocab.ui.navigation.Screen
 import com.example.engvocab.ui.theme.EngVocabTheme
+import com.example.engvocab.util.ThemePreference
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val themePreference = ThemePreference(applicationContext)
         setContent {
             val systemIsDark = isSystemInDarkTheme()
 
-            // Giữ state cho theme (dùng rememberSaveable để giữ qua configuration changes)
-            var isDarkTheme by rememberSaveable { mutableStateOf(systemIsDark) }
-
+            val isDarkTheme by themePreference.isDarkTheme.collectAsState(initial = false)
 
             EngVocabTheme(
                 darkTheme = isDarkTheme,
@@ -73,8 +77,10 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding)
                             .background(MaterialTheme.colorScheme.background),
                         onThemeChange = { isDark ->
-                            isDarkTheme = isDark
-                        }
+                            lifecycleScope.launch {
+                            themePreference.saveTheme(isDark)
+                        }},
+                        isDarkTheme = isDarkTheme
                     )
                 }
             }

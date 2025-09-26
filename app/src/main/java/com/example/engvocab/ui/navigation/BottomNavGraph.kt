@@ -21,7 +21,8 @@ import com.example.engvocab.ui.screens.topic.SubTopics
 fun BottomNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    onThemeChange: (Boolean) -> Unit
+    onThemeChange: (Boolean) -> Unit,
+    isDarkTheme: Boolean
 ) {
     NavHost(
         navController = navController,
@@ -29,7 +30,6 @@ fun BottomNavGraph(
         modifier = modifier
     ) {
         composable(Screen.Home.route) {
-            val isDarkTheme = isSystemInDarkTheme()
             HomeScreen(
                 navController = navController,
                 isDarkTheme = isDarkTheme,
