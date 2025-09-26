@@ -1,13 +1,12 @@
 package com.example.engvocab.ui.screens.topic
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,9 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,16 +27,18 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,21 +46,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import com.example.engvocab.data.model.TopicUiState
-import com.example.engvocab.data.model.Topics
-import com.example.engvocab.ui.navigation.Screen
+import com.example.engvocab.data.model.SubTopic
+import com.example.engvocab.data.model.SubTopicUiState
 import com.example.engvocab.util.AppViewModelProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopicScreen(
+fun SubTopics(
     navController: NavHostController,
+    topicId: String,
     viewModel: TopicViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val uiState = viewModel.uiState
+    val uiState = viewModel.subTopicUiState
+
+    LaunchedEffect(topicId) {
+        viewModel.loadSubTopics(topicId)
+    }
 
     Scaffold(
         topBar = {
@@ -80,7 +86,7 @@ fun TopicScreen(
         contentWindowInsets = WindowInsets(0.dp)
     ) { innerPadding ->
         when (uiState) {
-            TopicUiState.Loading -> {
+            SubTopicUiState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -90,8 +96,7 @@ fun TopicScreen(
                     CircularProgressIndicator()
                 }
             }
-
-            is TopicUiState.Error -> {
+            is SubTopicUiState.Error -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -105,92 +110,62 @@ fun TopicScreen(
                     )
                 }
             }
-
-            is TopicUiState.Success -> TopicsGrid(innerPadding, uiState.topics, navController)
-
-        }
-    }
-}
-
-@Composable
-fun TopicsGrid(innerPadding: PaddingValues, topics: List<Topics>, navController: NavHostController) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-    ) {
-        items(topics, key = { it.id ?: it.title.orEmpty() }) { topic ->
-            TopicGridItem(
-                topic = topic,
-                onClick = {
-                    val id = topic.id
-                    if (id != null) {
-                        navController.navigate(Screen.SubTopic.createRoute(id))
-                    } else {
-                        Log.e("TopicScreen", "Topic ID is missing for: ${topic.title}")
-                    }
+            is SubTopicUiState.Success -> SubTopicsList(innerPadding, uiState.subTopics)
+            SubTopicUiState.Empty -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No subtopics found for this topic.",
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
                 }
-            )
+            }
         }
+
     }
 }
 
 @Composable
-fun TopicGridItem(topic: Topics, onClick: () -> Unit) {
-    val context = LocalContext.current
-    Card(
+fun SubTopicsList(innerPadding: PaddingValues, subTopics: List<SubTopic>) {
+    LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant // Màu nền của thẻ
-        ),
-        elevation = CardDefaults.cardElevation(2.dp)
+            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize()
+            .padding(innerPadding),
+//        contentPadding = PaddingValues(16.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(bottom = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val imageLoader = remember {
-                ImageLoader.Builder(context)
-                    .components {
-                        // Đăng ký SVG Decoder
-                        add(SvgDecoder.Factory())
-                    }
-                    .build()
-            }
-
-            // 1. Hình ảnh (AsyncImage từ Coil)
-            AsyncImage(
-                model = topic.imageUrl.orEmpty(),
-                contentDescription = "Image for ${topic.title}",
+        items(subTopics, key = { it.url.orEmpty() }) { subTopic ->
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // chia tỉ lệ 16:9 hoặc 4:3... cho ảnh
-                    .aspectRatio(1f / 1f)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                imageLoader = imageLoader,
-                contentScale = ContentScale.Crop
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // 2. Tiêu đề
-            Text(
-                text = topic.title.orEmpty(),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                maxLines = 2, // Giới hạn 2 dòng
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                    .clickable {
+                        println("Clicked on sub-topic: ${subTopic.name}")
+                    }
+            ) {
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                ){
+                    subTopic.name?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp,horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
+

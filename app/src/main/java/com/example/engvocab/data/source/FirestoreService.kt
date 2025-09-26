@@ -1,5 +1,6 @@
 package com.example.engvocab.data.source
 
+import com.example.engvocab.data.model.Topics
 import com.example.engvocab.data.model.Vocabulary
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -8,6 +9,7 @@ import kotlinx.coroutines.tasks.await
 class FirestoreService {
     private val db = FirebaseFirestore.getInstance()
     private val wordsCollection = db.collection("OxfordWords")
+    private val topicsCollection = db.collection("Topics")
 
     suspend fun getAllVocabulary(): List<Vocabulary> {
         return try {
@@ -58,4 +60,34 @@ class FirestoreService {
             null
         }
     }
+
+
+    // Topics
+    suspend fun getAllTopics(): List<Topics> {
+        return try {
+            val snapshot = topicsCollection
+                .orderBy("title", Query.Direction.ASCENDING)
+                .get()
+                .await()
+
+            snapshot.documents.map { document ->
+                document.toObject(Topics::class.java)?.copy(id = document.id) ?: Topics()
+            }
+        } catch (e: Exception) {
+            println("Error fetching topics: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun getSubTopicById(id: String): Topics? {
+        return try {
+            val document = topicsCollection.document(id).get().await()
+
+            document.toObject(Topics::class.java)?.copy(id = document.id)
+        } catch (e: Exception) {
+            println("Error fetching topic by ID $id: ${e.message}")
+            null
+        }
+    }
+
 }

@@ -9,4 +9,7 @@ sealed class Screen(val route: String, val title:String, val icon:Int?=null ) {
     object VocabDetail : Screen("vocab_detail/{vocabId}","Detail"){
         fun createRoute(vocabId: String) = "vocab_detail/$vocabId"
     }
+    object SubTopic : Screen("sub_topic/{topicId}","Sub Topics"){
+        fun createRoute(topicId: String) = "sub_topic/$topicId"
+    }
 }

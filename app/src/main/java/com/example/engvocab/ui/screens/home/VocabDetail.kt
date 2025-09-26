@@ -272,13 +272,25 @@ fun VocabularyDetailContent(vocabulary: Vocabulary, context: Context) {
             )
         }
 
+// Topics
+        vocabulary.topics?.takeIf { it.isNotEmpty() }?.let { topics ->
+            val topicNames = topics.mapNotNull { it.name }.joinToString(", ")
+
+            Text(
+                text = "Topics: $topicNames",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
         Spacer(Modifier.height(16.dp))
         Divider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(Modifier.height(16.dp))
 
 //      Senses Display
         Text(
-            "Định nghĩa:",
+            "Define:",
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
@@ -303,7 +315,7 @@ fun DefinitionItem(index: Int, sense: Sense) {
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                sense.definition ?: "Không có định nghĩa",
+                sense.definition ?: "None Define",
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -345,7 +357,7 @@ fun SubDefinitionItem(mainIndex: Int, subIndex: Int, sense: Sense) {
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                sense.definition ?: "Không có định nghĩa phụ",
+                sense.definition ?: "None SubDefine",
                 fontSize = 15.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )

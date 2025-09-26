@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.engvocab.ui.screens.home.VocabDetail
 import com.example.engvocab.ui.screens.search.SearchScreen
+import com.example.engvocab.ui.screens.topic.SubTopics
 
 @Composable
 fun BottomNavGraph(
@@ -57,6 +58,20 @@ fun BottomNavGraph(
                     navController = navController,
                     vocabId = "" // Truyền rỗng hoặc xử lý lỗi
                 )
+            }
+        }
+        composable(
+            Screen.SubTopic.route,
+            arguments = listOf(navArgument("topicId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val topicId = backStackEntry.arguments?.getString("topicId")
+            if (topicId != null) {
+                SubTopics(
+                    navController = navController,
+                    topicId = topicId
+                )
+            } else {
+                navController.popBackStack()
             }
         }
     }
