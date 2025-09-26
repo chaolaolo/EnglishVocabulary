@@ -7,5 +7,10 @@ data class HomeUiState(
     val totalPages: Int = 1,
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+
+    // Search
+    val searchQuery: String = "",
+    val searchResults: List<Vocabulary> = emptyList(),
+    val isSearching: Boolean = false,
 )

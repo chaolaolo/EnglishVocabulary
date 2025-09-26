@@ -6,11 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.engvocab.data.model.HomeUiState
+import com.example.engvocab.data.model.Vocabulary
 import com.example.engvocab.data.repository.VocabRepository
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 private const val PAGE_SIZE = 100L
+private const val SEARCH_LIMIT = 50L
 
 class HomeViewModel(
     private val repository: VocabRepository = VocabRepository()
@@ -26,6 +28,34 @@ class HomeViewModel(
     init {
         pageAnchors.add(null) // Trang 1 bắt đầu từ null
         fetchVocabularyPage(1)
+    }
+
+    fun searchVocabulary(query: String) {
+        if (uiState.searchQuery == query) return
+
+        uiState = uiState.copy(searchQuery = query, isSearching = true, error = null)
+        if (query.isBlank()) {
+            uiState = uiState.copy(searchResults = emptyList(), isSearching = false)
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val results = repository.searchVocabulary(query.toLowerCase(), SEARCH_LIMIT)
+                val sortedResults = results.sortedWith(compareBy<Vocabulary> {
+                    it.word?.toLowerCase()?.startsWith(query.toLowerCase()) != true
+                }.thenBy { it.word?.toLowerCase() })
+
+                uiState = uiState.copy(
+                    searchResults = sortedResults,
+                    isSearching = false
+                )
+            } catch (e: Exception) {
+                uiState = uiState.copy(
+                    error = "Lỗi tìm kiếm: ${e.message}", isSearching = false
+                )
+            }
+        }
     }
 
     private fun fetchVocabularyPage(page: Int) {

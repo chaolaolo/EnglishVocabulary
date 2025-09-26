@@ -1,5 +1,6 @@
 package com.example.engvocab.data.source
 
+import androidx.room.util.copy
 import com.example.engvocab.data.model.Topics
 import com.example.engvocab.data.model.Vocabulary
 import com.google.firebase.firestore.FirebaseFirestore
@@ -61,6 +62,26 @@ class FirestoreService {
         }
     }
 
+    suspend fun searchVocabulary(prefix: String, limit: Long): List<Vocabulary> {
+        return try {
+            val endPrefix = prefix + "\uf8ff"
+            val query = wordsCollection
+                .orderBy("word", Query.Direction.ASCENDING)
+                .startAt(prefix)
+                .endAt(endPrefix)
+                .limit(limit)
+
+            val snapshot = query.get().await()
+
+            snapshot.documents.map { document ->
+                document.toObject(Vocabulary::class.java)?.copy(id = document.id) ?: Vocabulary()
+            }
+        } catch (e: Exception) {
+            println("Error searching vocabulary: ${e.message}")
+            emptyList()
+        }
+    }
+
     suspend fun getVocabularyByTopic(topicName: String): List<Vocabulary> {
         return try {
             // Lọc các từ có chứa topicName trong mảng topics.name
@@ -79,7 +100,7 @@ class FirestoreService {
 //                val vocab = document.toObject(Vocabulary::class.java)?.copy(id = document.id)
 //                if (vocab?.topics?.any { it.name == topicName } == true) vocab else null
 //            }.sortedBy { it.word }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             println("Error fetching vocabulary for topic '$topicName': ${e.message}")
             emptyList()
         }

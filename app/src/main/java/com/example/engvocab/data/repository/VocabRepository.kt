@@ -18,6 +18,10 @@ class VocabRepository(
         return firestoreService.getVocabularyById(id)
     }
 
+    suspend fun searchVocabulary(prefix: String, limit: Long): List<Vocabulary> {
+        return firestoreService.searchVocabulary(prefix, limit)
+    }
+
     suspend fun getVocabularyByTopic(topicName: String): List<Vocabulary> {
         return firestoreService.getVocabularyByTopic(topicName)
     }
