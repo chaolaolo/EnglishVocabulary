@@ -17,6 +17,8 @@ class HomeViewModel(
 ) : ViewModel() {
     var uiState by mutableStateOf(HomeUiState(isLoading = true))
         private set
+    var topicVocabUiState by mutableStateOf(HomeUiState(isLoading = false))
+        private set
 
     private val pageAnchors = mutableListOf<String?>()
     private var isFetchingNextPage = false
@@ -25,31 +27,6 @@ class HomeViewModel(
         pageAnchors.add(null) // Trang 1 bắt đầu từ null
         fetchVocabularyPage(1)
     }
-
-//    @SuppressLint("DefaultLocale")
-//    private fun fetchVocabulary() {
-//        viewModelScope.launch {
-//            uiState = uiState.copy(isLoading = true, error = null)
-//            try {
-//                var result = repository.getVocabularyList()
-//                result = result.sortedBy { it.word?.toLowerCase() }
-//
-//                val totalPages = ceil(result.size.toDouble() / PAGE_SIZE).toInt().coerceAtLeast(1)
-//
-//                uiState = uiState.copy(
-//                    vocabulary = result,
-//                    totalPages = totalPages,
-//                    isLoading = false
-//                )
-//                updateVocabularyForPage(1)
-//            } catch (e: Exception) {
-//                uiState = uiState.copy(
-//                    error = "Error fetching vocabulary: ${e.message}",
-//                    isLoading = false,
-//                )
-//            }
-//        }
-//    }
 
     private fun fetchVocabularyPage(page: Int) {
         viewModelScope.launch {
@@ -94,23 +71,6 @@ class HomeViewModel(
         }
     }
 
-
-//    private fun updateVocabularyForPage(page: Int) {
-//        val startIndex = (page - 1) * PAGE_SIZE
-//        val endIndex = (startIndex + PAGE_SIZE).coerceAtMost(uiState.vocabulary.size)
-//
-//        val listOnPage = if (startIndex < uiState.vocabulary.size) {
-//            uiState.vocabulary.subList(startIndex, endIndex)
-//        } else {
-//            emptyList()
-//        }
-//
-//        uiState = uiState.copy(
-//            vocabularyOnPage = listOnPage,
-//            currentPage = page
-//        )
-//    }
-
     fun nextPage() {
         val next = uiState.currentPage + 1
         if (next <= uiState.totalPages) {
@@ -146,5 +106,32 @@ class HomeViewModel(
             fetchVocabularyPage(1)
 
         }
+    }
+
+    fun loadVocabularyByTopic(topicName: String) {
+        viewModelScope.launch {
+            topicVocabUiState = topicVocabUiState.copy(isLoading = true, error = null)
+            try {
+                val vocabList = repository.getVocabularyByTopic(topicName)
+
+                if (vocabList.isNotEmpty()) {
+                    topicVocabUiState = topicVocabUiState.copy(
+                        vocabularyOnPage = vocabList,
+                        isLoading = false
+                    )
+                } else {
+                    topicVocabUiState = topicVocabUiState.copy(
+                        error = "No words found for topic: $topicName",
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                topicVocabUiState = topicVocabUiState.copy(
+                    error = e.message ?: "Failed to load vocabulary by topic",
+                    isLoading = false
+                )
+            }
+        }
+
     }
 }

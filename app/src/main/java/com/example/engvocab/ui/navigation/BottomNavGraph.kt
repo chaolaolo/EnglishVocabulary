@@ -1,5 +1,6 @@
 package com.example.engvocab.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.engvocab.ui.screens.home.VocabDetail
+import com.example.engvocab.ui.screens.home.VocabularyOfTopicScreen
 import com.example.engvocab.ui.screens.search.SearchScreen
 import com.example.engvocab.ui.screens.topic.SubTopics
 
@@ -71,6 +73,30 @@ fun BottomNavGraph(
                     topicId = topicId
                 )
             } else {
+                navController.popBackStack()
+            }
+        }
+
+        composable(
+            Screen.VocabularyOfTopic.route,
+            arguments = listOf(navArgument("topicName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedTopicName = backStackEntry.arguments?.getString("topicName")
+
+            if (encodedTopicName != null) {
+                // Giải mã chỉ khi tham số gốc không null
+                val topicName = java.net.URLDecoder.decode(
+                    encodedTopicName,
+                    java.nio.charset.StandardCharsets.UTF_8.toString()
+                )
+
+                VocabularyOfTopicScreen(
+                    navController = navController,
+                    topicName = topicName
+                )
+            } else {
+                // Nếu tham số là null, in ra log lỗi và quay lại
+                Log.e("NavGraph", "Missing 'topicName' argument for VocabularyOfTopicScreen")
                 navController.popBackStack()
             }
         }

@@ -61,6 +61,30 @@ class FirestoreService {
         }
     }
 
+    suspend fun getVocabularyByTopic(topicName: String): List<Vocabulary> {
+        return try {
+            // Lọc các từ có chứa topicName trong mảng topics.name
+            val snapshot = wordsCollection
+                .whereArrayContains("topicNames", topicName)
+                .orderBy("word", Query.Direction.ASCENDING)
+                .get()
+                .await()
+
+            snapshot.documents.map { document ->
+                document.toObject(Vocabulary::class.java)?.copy(id = document.id) ?: Vocabulary()
+            }
+            // Trả về toàn bộ danh sách các Vocabulary
+//            val snapshot = wordsCollection.get().await()
+//            snapshot.documents.mapNotNull { document ->
+//                val vocab = document.toObject(Vocabulary::class.java)?.copy(id = document.id)
+//                if (vocab?.topics?.any { it.name == topicName } == true) vocab else null
+//            }.sortedBy { it.word }
+        }catch (e: Exception){
+            println("Error fetching vocabulary for topic '$topicName': ${e.message}")
+            emptyList()
+        }
+    }
+
 
     // Topics
     suspend fun getAllTopics(): List<Topics> {

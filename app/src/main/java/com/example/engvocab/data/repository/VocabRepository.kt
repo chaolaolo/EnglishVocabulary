@@ -7,10 +7,6 @@ class VocabRepository(
     private val firestoreService: FirestoreService = FirestoreService()
 ) {
 
-    suspend fun getVocabularyList(): List<Vocabulary> {
-        return firestoreService.getAllVocabulary()
-    }
-
     suspend fun getVocabularyPage(
         pageSize: Long,
         lastWordInPreviousPage: String? = null
@@ -20,5 +16,9 @@ class VocabRepository(
 
     suspend fun getVocabularyById(id: String): Vocabulary? {
         return firestoreService.getVocabularyById(id)
+    }
+
+    suspend fun getVocabularyByTopic(topicName: String): List<Vocabulary> {
+        return firestoreService.getVocabularyByTopic(topicName)
     }
 }
