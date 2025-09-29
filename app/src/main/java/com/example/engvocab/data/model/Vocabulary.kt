@@ -15,28 +15,28 @@ data class Vocabulary(
     val topics: List<Topic>? = null
 )
 
-// --- Lớp cho Phát âm (Phonetics) ---
+// --- Phonetics ---
 data class Phonetics(
     val uk: PronunciationDetail? = null,
     val us: PronunciationDetail? = null
 )
 
-// Chi tiết phát âm (cho UK và US)
+// Chi tiết Phonetics
 data class PronunciationDetail(
     val audio: String? = null,
     val text: String? = null
 )
 
-// --- Lớp cho Nghĩa (Sense) ---
+// --- Sense  ---
 data class Sense(
     val definition: String? = null,
     val examples: List<String>? = null,
     val senses: List<Sense>? = null
 )
 
-// --- Lớp cho Dạng Động từ (VerbForms) ---
+// --- VerbForms ---
 data class VerbForms(
-    val word: String? = null // Ví dụ: "a"
+    val word: String? = null
 )
 
 // Topics

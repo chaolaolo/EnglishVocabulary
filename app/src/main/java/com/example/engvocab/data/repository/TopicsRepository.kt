@@ -14,7 +14,6 @@ class TopicsRepository(
     suspend fun getSubTopicById(topicId: String): List<SubTopic> {
         val topic = firestoreService.getSubTopicById(topicId)
 
-        // Trả về danh sách subTopics, hoặc danh sách rỗng nếu topic là null hoặc subTopics là null
         return topic?.subTopics ?: emptyList()
     }
 }

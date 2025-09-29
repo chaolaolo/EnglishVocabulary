@@ -12,37 +12,21 @@ class FirestoreService {
     private val wordsCollection = db.collection("OxfordWords")
     private val topicsCollection = db.collection("Topics")
 
-    suspend fun getAllVocabulary(): List<Vocabulary> {
-        return try {
-            val snapshot = wordsCollection.get().await()
-//            snapshot.toObjects(Vocabulary::class.java)
-            snapshot.documents.map { document ->
-                document.toObject(Vocabulary::class.java)?.copy(id = document.id) ?: Vocabulary()
-            }
-        } catch (e: Exception) {
-            println("Error fetching vocabulary: ${e.message}")
-            emptyList()
-        }
-    }
-
     suspend fun getVocabularyPage(
         pageSize: Long,
         lastWordInPreviousPage: String? = null
     ): List<Vocabulary> {
         return try {
-            // 1. Tạo truy vấn cơ bản: Sắp xếp theo từ (word)
             var query: Query = wordsCollection
                 .orderBy("word", Query.Direction.ASCENDING)
                 .limit(pageSize)
 
-            // 2. Xử lý phân trang: Bắt đầu từ từ cuối cùng của trang trước
             if (lastWordInPreviousPage != null) {
                 query = query.startAfter(lastWordInPreviousPage)
             }
 
             val snapshot = query.get().await()
 
-            // 3. Map kết quả sang đối tượng Vocabulary và thêm ID
             snapshot.documents.map { document ->
                 document.toObject(Vocabulary::class.java)?.copy(id = document.id) ?: Vocabulary()
             }
@@ -84,22 +68,12 @@ class FirestoreService {
 
     suspend fun getVocabularyByTopic(topicName: String): List<Vocabulary> {
         return try {
-            // Lọc các từ có chứa topicName trong mảng topics.name
-            val snapshot = wordsCollection
-                .whereArrayContains("topicNames", topicName)
-                .orderBy("word", Query.Direction.ASCENDING)
-                .get()
-                .await()
-
-            snapshot.documents.map { document ->
-                document.toObject(Vocabulary::class.java)?.copy(id = document.id) ?: Vocabulary()
-            }
-            // Trả về toàn bộ danh sách các Vocabulary
-//            val snapshot = wordsCollection.get().await()
-//            snapshot.documents.mapNotNull { document ->
-//                val vocab = document.toObject(Vocabulary::class.java)?.copy(id = document.id)
-//                if (vocab?.topics?.any { it.name == topicName } == true) vocab else null
-//            }.sortedBy { it.word }
+            val snapshot = wordsCollection.get().await()
+            snapshot.documents.mapNotNull { document ->
+                val vocab = document.toObject(Vocabulary::class.java)?.copy(id = document.id)
+                // Lọc những từ có ít nhất 1 topic.name khớp với topicName truyền vào
+                if (vocab?.topics?.any { it.name == topicName } == true) vocab else null
+            }.sortedBy { it.word }
         } catch (e: Exception) {
             println("Error fetching vocabulary for topic '$topicName': ${e.message}")
             emptyList()

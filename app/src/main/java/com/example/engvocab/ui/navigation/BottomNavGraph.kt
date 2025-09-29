@@ -48,17 +48,15 @@ fun BottomNavGraph(
         ) {backStackEntry ->
             val vocabId = backStackEntry.arguments?.getString("vocabId")
 
-            // 🚀 Kiểm tra và gọi VocabDetail với ID
             if (vocabId != null) {
                 VocabDetail(
                     navController = navController,
-                    vocabId = vocabId // 🚀 Truyền ID vào Composable
+                    vocabId = vocabId
                 )
             } else {
-                // Xử lý lỗi nếu ID bị thiếu
                 VocabDetail(
                     navController = navController,
-                    vocabId = "" // Truyền rỗng hoặc xử lý lỗi
+                    vocabId = ""
                 )
             }
         }
@@ -84,7 +82,6 @@ fun BottomNavGraph(
             val encodedTopicName = backStackEntry.arguments?.getString("topicName")
 
             if (encodedTopicName != null) {
-                // Giải mã chỉ khi tham số gốc không null
                 val topicName = java.net.URLDecoder.decode(
                     encodedTopicName,
                     java.nio.charset.StandardCharsets.UTF_8.toString()
@@ -95,7 +92,6 @@ fun BottomNavGraph(
                     topicName = topicName
                 )
             } else {
-                // Nếu tham số là null, in ra log lỗi và quay lại
                 Log.e("NavGraph", "Missing 'topicName' argument for VocabularyOfTopicScreen")
                 navController.popBackStack()
             }

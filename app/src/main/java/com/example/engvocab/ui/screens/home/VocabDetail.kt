@@ -2,14 +2,17 @@
 
 package com.example.engvocab.ui.screens.home
 
+import android.R.attr.name
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,6 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,6 +71,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import com.example.engvocab.R
@@ -73,7 +79,10 @@ import com.example.engvocab.data.model.PronunciationDetail
 import com.example.engvocab.data.model.Sense
 import com.example.engvocab.data.model.Vocabulary
 import com.example.engvocab.data.repository.VocabRepository
+import com.example.engvocab.ui.navigation.Screen
 import com.example.engvocab.util.playAudio
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,13 +99,11 @@ fun VocabDetail(
                 modelClass: Class<T>,
                 handle: SavedStateHandle
             ): T {
-                // 1. Ghi đè SavedStateHandle để chứa ID được truyền qua Nav
                 handle["vocabId"] = vocabId
 
-                // 2. Trả về instance của ViewModel
                 return VocabDetailViewModel(
                     savedStateHandle = handle,
-                    repository = VocabRepository() // Cung cấp dependency thủ công
+                    repository = VocabRepository()
                 ) as T
             }
 
@@ -120,9 +127,9 @@ fun VocabDetail(
                 },
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background, // 👉 đổi màu nền tại đây
-                    titleContentColor = MaterialTheme.colorScheme.onBackground, // 👉 màu chữ
-                    actionIconContentColor = MaterialTheme.colorScheme.onBackground // 👉 màu icon
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 windowInsets = WindowInsets(0.dp),
                 navigationIcon = {
@@ -166,7 +173,11 @@ fun VocabDetail(
                 }
 
                 vocabulary != null -> {
-                    VocabularyDetailContent(vocabulary = vocabulary, context = context)
+                    VocabularyDetailContent(
+                        vocabulary = vocabulary,
+                        context = context,
+                        navController
+                    )
                 }
 
                 else -> {
@@ -184,7 +195,11 @@ fun VocabDetail(
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
-fun VocabularyDetailContent(vocabulary: Vocabulary, context: Context) {
+fun VocabularyDetailContent(
+    vocabulary: Vocabulary,
+    context: Context,
+    navController: NavController
+) {
     val usPhonetic = vocabulary.phonetics?.us
     val ukPhonetic = vocabulary.phonetics?.uk
 
@@ -274,14 +289,42 @@ fun VocabularyDetailContent(vocabulary: Vocabulary, context: Context) {
 
 // Topics
         vocabulary.topics?.takeIf { it.isNotEmpty() }?.let { topics ->
-            val topicNames = topics.mapNotNull { it.name }.joinToString(", ")
-
             Text(
-                text = "Topics: $topicNames",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
+                text = "Topics:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
+            Spacer(Modifier.height(4.dp))
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                topics.mapNotNull { it.name }.forEach { topicName ->
+                    Text(
+                        text = topicName.replaceFirstChar { it.uppercase() },
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        textDecoration = TextDecoration.Underline,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(vertical = 2.dp)
+                            .clickable {
+                                val encodedName = URLEncoder.encode(
+                                    topicName.trim(),
+                                    StandardCharsets.UTF_8.toString()
+                                )
+                                navController.navigate(
+                                    Screen.VocabularyOfTopic.createRoute(
+                                        encodedName
+                                    )
+                                )
+                            }
+                    )
+                }
+            }
         }
 
         Spacer(Modifier.height(16.dp))
@@ -408,48 +451,3 @@ fun PronunciationRow(
         )
     }
 }
-
-//fun playAudio(
-//    context: Context,
-//    exoPlayer: ExoPlayer,
-//    audioUrl: String
-//) {
-//    try {
-//        val mediaItem = MediaItem.fromUri(audioUrl)
-//
-//        // 1. Dừng player trước khi bắt đầu phát file mới
-//        exoPlayer.stop()
-//
-//        // 2. Cài đặt nguồn dữ liệu
-//        exoPlayer.setMediaItem(mediaItem)
-//
-//        // 3. Chuẩn bị và bắt đầu phát
-//        exoPlayer.prepare()
-//        exoPlayer.playWhenReady = true
-//
-//        // 4. Lắng nghe sự kiện để thông báo hoặc xử lý lỗi/hoàn thành
-//        exoPlayer.addListener(object : Player.Listener {
-//            override fun onPlayerError(error: PlaybackException) {
-//                super.onPlayerError(error)
-//                Log.e("AudioPlayer", "Lỗi phát âm thanh ExoPlayer: ${error.message}")
-//                Log.e("AudioPlayer", "Error code: ${error.errorCode}, message: ${error.message}")
-//                Toast.makeText(context, "Lỗi: Không thể phát file.", Toast.LENGTH_LONG).show()
-//                exoPlayer.removeListener(this) // Gỡ bỏ listener sau khi hoàn thành/lỗi
-//            }
-//
-//            override fun onPlaybackStateChanged(state: Int) {
-//                super.onPlaybackStateChanged(state)
-//                if (state == Player.STATE_ENDED) {
-//                    // Dừng và reset khi hoàn thành
-//                    exoPlayer.seekTo(0)
-//                    exoPlayer.playWhenReady = false
-//                    exoPlayer.removeListener(this) // Gỡ bỏ listener sau khi hoàn thành/lỗi
-//                }
-//            }
-//        })
-//
-//    } catch (e: Exception) {
-//        Log.e("AudioPlayer", "Lỗi cấu hình ExoPlayer: ${e.message}")
-//        Toast.makeText(context, "Lỗi phát âm thanh", Toast.LENGTH_SHORT).show()
-//    }
-//}

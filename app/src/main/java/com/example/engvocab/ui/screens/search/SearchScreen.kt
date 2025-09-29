@@ -119,9 +119,9 @@ fun SearchScreen(
                 },
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background, // 👉 đổi màu nền tại đây
-                    titleContentColor = MaterialTheme.colorScheme.onBackground, // 👉 màu chữ
-                    actionIconContentColor = MaterialTheme.colorScheme.onBackground // 👉 màu icon
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 windowInsets = WindowInsets(0.dp)
             )
@@ -199,76 +199,16 @@ fun SearchScreen(
         }
     }
 }
-
-@Composable
-fun PageCounter(
-    currentPage: Int,
-    totalPages: Int,
-    onPreviousClick: () -> Unit,
-    onNextClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Nút Trang trước
-        IconButton(
-            onClick = onPreviousClick,
-            enabled = currentPage > 1, // Vô hiệu hóa khi ở trang 1
-        ) {
-            Icon(
-                // Sử dụng Icon đơn giản, bạn có thể thay bằng Arrow icon
-                painter = painterResource(R.drawable.round_arrow_back_ios_new),
-                contentDescription = "Previous Page",
-                tint = if (currentPage > 1) MaterialTheme.colorScheme.primary else Color.LightGray
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        // Hiển thị số trang (1/100)
-        Card(
-            shape = MaterialTheme.shapes.extraSmall,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-        ) {
-            Text(
-                text = "$currentPage/$totalPages",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        // Nút Trang tiếp theo
-        IconButton(
-            onClick = onNextClick,
-            enabled = currentPage < totalPages, // Vô hiệu hóa khi ở trang cuối
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.round_arrow_forward_ios),
-                contentDescription = "Next Page",
-                tint = if (currentPage < totalPages) MaterialTheme.colorScheme.primary else Color.LightGray
-            )
-        }
-    }
-}
-
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun VocabularyCard(
     item: Vocabulary,
     onClick: () -> Unit = {}
 ) {
-    // Lấy phiên âm (ưu tiên US, nếu không có thì UK, nếu không thì rỗng)
     val phoneticsText = item.phonetics?.us?.text ?: item.phonetics?.uk?.text ?: ""
-    // Lấy Audio URL (ưu tiên US, nếu không có thì UK)
     val audioUrl = item.phonetics?.us?.audio ?: item.phonetics?.uk?.audio
-
     val context = LocalContext.current
 
-    // Sử dụng remember/DisposableEffect để quản lý ExoPlayer
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
             // Tối ưu cho phát âm thanh
@@ -283,18 +223,15 @@ fun VocabularyCard(
         }
     }
 
-    // Xử lý vòng đời (lifecycle) của Player
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    // Dừng phát khi ứng dụng bị tạm dừng (pause)
                     exoPlayer.pause()
                 }
 
                 Lifecycle.Event.ON_DESTROY -> {
-                    // Giải phóng tài nguyên khi Composables bị hủy
                     exoPlayer.release()
                 }
 
@@ -304,7 +241,6 @@ fun VocabularyCard(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            // Đảm bảo giải phóng nếu chưa được gọi từ ON_DESTROY
             if (exoPlayer.isReleased.not()) {
                 exoPlayer.release()
             }

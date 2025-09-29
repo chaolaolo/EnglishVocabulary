@@ -144,13 +144,13 @@ class HomeViewModel(
             try {
                 val vocabList = repository.getVocabularyByTopic(topicName)
 
-                if (vocabList.isNotEmpty()) {
-                    topicVocabUiState = topicVocabUiState.copy(
+                topicVocabUiState = if (vocabList.isNotEmpty()) {
+                    topicVocabUiState.copy(
                         vocabularyOnPage = vocabList,
                         isLoading = false
                     )
                 } else {
-                    topicVocabUiState = topicVocabUiState.copy(
+                    topicVocabUiState.copy(
                         error = "No words found for topic: $topicName",
                         isLoading = false
                     )

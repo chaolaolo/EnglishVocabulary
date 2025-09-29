@@ -146,7 +146,6 @@ fun SubTopicsList(
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(innerPadding),
-//        contentPadding = PaddingValues(16.dp)
     ) {
         items(subTopics, key = { it.url.orEmpty() }) { subTopic ->
             Card(
@@ -154,22 +153,10 @@ fun SubTopicsList(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .clickable {
-//                        val name = subTopic.name
-//                        if (name != null) {
-//                            // mã hoá
-//                            val encodedTopicName = java.net.URLEncoder.encode(
-//                                name,
-//                                java.nio.charset.StandardCharsets.UTF_8.toString()
-//                            )
-//                            // điều hướng
-//                            navController.navigate(
-//                                Screen.VocabularyOfTopic.createRoute(
-//                                    encodedTopicName
-//                                )
-//                            )
-//                        }
                         subTopic.name?.let { name ->
-                            val encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.toString())
+                            val normalizedName = name.trim()
+                            val encodedName =
+                                URLEncoder.encode(normalizedName, StandardCharsets.UTF_8.toString())
                             navController.navigate(Screen.VocabularyOfTopic.createRoute(encodedName))
                         }
                     }

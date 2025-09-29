@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -63,6 +65,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.engvocab.R
 import com.example.engvocab.data.model.Vocabulary
 import com.example.engvocab.ui.navigation.Screen
+import com.example.engvocab.ui.screens.search.VocabularyCard
 import com.example.engvocab.util.playAudio
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -85,7 +88,7 @@ fun VocabularyOfTopicScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Words: $topicName",
+                        text = topicName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -93,16 +96,16 @@ fun VocabularyOfTopicScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            painter = painterResource(R.drawable.round_arrow_back_ios_new), // Cần import Icons.Filled.ArrowBack
+                            painter = painterResource(R.drawable.round_arrow_back_ios_new),
                             contentDescription = "Back"
                         )
                     }
                 },
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background, // 👉 đổi màu nền tại đây
-                    titleContentColor = MaterialTheme.colorScheme.onBackground, // 👉 màu chữ
-                    actionIconContentColor = MaterialTheme.colorScheme.onBackground // 👉 màu icon
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 windowInsets = WindowInsets(0.dp)
             )
@@ -134,46 +137,57 @@ fun VocabularyOfTopicScreen(
                     )
                 }
 
-                else -> {
-                    LazyColumn(
-                        state = rememberLazyListState(),
+                uiState.vocabularyOnPage.isEmpty() -> {
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background),
+                            .padding(innerPadding),
+                        contentAlignment = Alignment.Center
                     ) {
-                        items(uiState.vocabularyOnPage, key = { it.id.orEmpty() }) { vocab ->
-                            VocabularyCard(
-                                item = vocab,
-                                onClick = {
-                                    vocab.id?.let { id ->
-                                        val encodedId = URLEncoder.encode(
-                                            id,
-                                            StandardCharsets.UTF_8.toString()
-                                        )
-                                        navController.navigate(
-                                            Screen.VocabDetail.createRoute(
-                                                encodedId
-                                            )
-                                        )
-                                    }
-                                },
-                            )
-                        }
-
-                        if (uiState.vocabularyOnPage.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "No words found for this topic.",
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.padding(16.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
+                        Text(
+                            text = "No vocabulary found for this topic.",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
+
+                else -> VocabularyListContent(navController, innerPadding, uiState.vocabularyOnPage)
             }
         }
     }
 }
 
+
+@Composable
+fun VocabularyListContent(
+    navController: NavHostController,
+    innerPadding: PaddingValues,
+    vocabularyList: List<Vocabulary>
+) {
+    LazyColumn(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize()
+//            .padding(innerPadding)
+    ) {
+        items(vocabularyList, key = { it.id.orEmpty() }) { vocab ->
+            VocabularyCard(
+                item = vocab,
+                onClick = {
+                    vocab.id?.let { id ->
+                        val encodedId = URLEncoder.encode(
+                            id,
+                            StandardCharsets.UTF_8.toString()
+                        )
+                        navController.navigate(
+                            Screen.VocabDetail.createRoute(
+                                encodedId
+                            )
+                        )
+                    }
+                },
+            )
+        }
+    }
+}

@@ -17,7 +17,6 @@ class ThemePreference(private val context: Context) {
 
     val isDarkTheme: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
-            // Đọc giá trị, mặc định là false (Light Theme)
             preferences[DARK_THEME_KEY] ?: false
         }
 
