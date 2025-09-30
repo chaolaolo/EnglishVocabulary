@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -34,13 +35,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.engvocab.ui.navigation.BottomNavGraph
 import com.example.engvocab.ui.navigation.Screen
 import com.example.engvocab.ui.theme.EngVocabTheme
+import com.example.engvocab.util.AdMobBanner
 import com.example.engvocab.util.ThemePreference
+import com.google.android.gms.ads.MobileAds
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        MobileAds.initialize(this){}
 
         val themePreference = ThemePreference(applicationContext)
         setContent {
@@ -68,7 +73,13 @@ class MainActivity : ComponentActivity() {
                                 Screen.Search.route
                             )
                         ) {
-                            BottomBar(navController = navController)
+                            Column {
+                                // 1. Bottom Menu
+                                BottomBar(navController = navController)
+
+                                // 2. Quảng cáo Banner
+                                AdMobBanner()
+                            }
                         }
                     }) { innerPadding ->
                     BottomNavGraph(

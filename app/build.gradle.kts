@@ -73,6 +73,5 @@ dependencies {
     implementation("io.coil-kt:coil-svg:2.7.0")
     implementation("androidx.datastore:datastore-preferences-core:1.1.7")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
-//    implementation("androidx.compose.material3:material3-window-size-class:1.1.2") // (hoặc phiên bản mới nhất)
-//    implementation("androidx.compose.foundation:foundation-layout:1.6.0") // (hoặc phiên bản mới nhất)
+    implementation("com.google.android.gms:play-services-ads:24.6.0")
 }

@@ -1,6 +1,7 @@
 package com.example.engvocab.ui.screens.search
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -67,6 +68,10 @@ import com.example.engvocab.data.model.Vocabulary
 import com.example.engvocab.ui.navigation.Screen
 import com.example.engvocab.ui.screens.home.HomeViewModel
 import com.example.engvocab.util.playAudio
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -82,6 +87,9 @@ fun SearchScreen(
     } else {
         uiState.vocabularyOnPage
     }
+
+    val context = LocalContext.current
+    val activity = context as? Activity
 
     Scaffold(
         topBar = {
@@ -164,13 +172,23 @@ fun SearchScreen(
                                 item = vocab,
                                 onClick = {
                                     vocab.id?.let { id ->
-                                        val encodedId =
-                                            URLEncoder.encode(id, StandardCharsets.UTF_8.toString())
-                                        navController.navigate(
-                                            Screen.VocabDetail.createRoute(
-                                                encodedId
+                                        val navigateAction = {
+                                            val encodedId =
+                                                URLEncoder.encode(id, StandardCharsets.UTF_8.toString())
+                                            navController.navigate(
+                                                Screen.VocabDetail.createRoute(
+                                                    encodedId
+                                                )
                                             )
-                                        )
+                                        }
+                                        if (activity != null) {
+                                            loadAndShowInterstitialAd(
+                                                activity = activity,
+                                                onAdDismissed = navigateAction
+                                            )
+                                        } else {
+                                            navigateAction()
+                                        }
                                     }
                                 },
                             )
@@ -286,4 +304,43 @@ fun VocabularyCard(
             }
         }
     }
+}
+
+
+// loadAndShowInterstitialAd
+private fun loadAndShowInterstitialAd(
+    activity: Activity,
+    onAdDismissed: () -> Unit
+) {
+    val adUnitId = "ca-app-pub-3940256099942544/1033173712"
+
+    InterstitialAd.load(
+        activity,
+        adUnitId,
+        AdRequest.Builder().build(),
+        object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                Log.e("AdMob", "Interstitial Ad failed to load: ${adError.message}")
+                onAdDismissed()
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                Log.d("AdMob", "Interstitial Ad loaded.")
+
+                interstitialAd.fullScreenContentCallback = object : com.google.android.gms.ads.FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        Log.d("AdMob", "Interstitial Ad dismissed.")
+                        onAdDismissed()
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(adError: com.google.android.gms.ads.AdError) {
+                        Log.e("AdMob", "Interstitial Ad failed to show: ${adError.message}")
+                        onAdDismissed()
+                    }
+                }
+
+                interstitialAd.show(activity)
+            }
+        }
+    )
 }
