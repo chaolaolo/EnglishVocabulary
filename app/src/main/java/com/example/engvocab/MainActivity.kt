@@ -70,7 +70,8 @@ class MainActivity : ComponentActivity() {
                         if (currentRoute in listOf(
                                 Screen.Home.route,
                                 Screen.Topic.route,
-                                Screen.Search.route
+                                Screen.Reading.route,
+                                Screen.Search.route,
                             )
                         ) {
                             Column {
@@ -104,6 +105,7 @@ fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         Screen.Home,
         Screen.Topic,
+        Screen.Reading,
         Screen.Search,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()

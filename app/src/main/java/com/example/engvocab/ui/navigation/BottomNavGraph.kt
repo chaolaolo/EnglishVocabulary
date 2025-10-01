@@ -14,6 +14,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.engvocab.ui.screens.home.VocabDetail
 import com.example.engvocab.ui.screens.home.VocabularyOfTopicScreen
+import com.example.engvocab.ui.screens.reading.ReadingScreen
+import com.example.engvocab.ui.screens.reading.StoriesScreen
+import com.example.engvocab.ui.screens.reading.StoryScreen
+import com.example.engvocab.ui.screens.reading.SubReadingScreen
 import com.example.engvocab.ui.screens.search.SearchScreen
 import com.example.engvocab.ui.screens.topic.SubTopics
 
@@ -39,13 +43,16 @@ fun BottomNavGraph(
         composable(Screen.Topic.route) {
             TopicScreen(navController = navController)
         }
+        composable(Screen.Reading.route) {
+            ReadingScreen(navController = navController)
+        }
         composable(Screen.Search.route) {
             SearchScreen(navController = navController)
         }
         composable(
             Screen.VocabDetail.route,
             arguments = listOf(navArgument("vocabId") { type = NavType.StringType })
-        ) {backStackEntry ->
+        ) { backStackEntry ->
             val vocabId = backStackEntry.arguments?.getString("vocabId")
 
             if (vocabId != null) {
@@ -96,5 +103,67 @@ fun BottomNavGraph(
                 navController.popBackStack()
             }
         }
+
+
+        composable(
+            Screen.SubReadingTopic.route,
+            arguments = listOf(navArgument("readingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val readingId = backStackEntry.arguments?.getString("readingId")
+            if (readingId != null) {
+                SubReadingScreen(
+                    navController = navController,
+                    readingId = readingId
+                )
+            } else {
+                navController.popBackStack()
+            }
+        }
+
+        composable(
+            route = Screen.StoriesScreen.route,
+            arguments = listOf(
+                navArgument("readingId") { type = NavType.StringType },
+                navArgument("subTopicId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val readingId = backStackEntry.arguments?.getString("readingId")
+            val subTopicId = backStackEntry.arguments?.getString("subTopicId")
+
+            if (readingId != null && subTopicId != null) {
+                StoriesScreen(
+                    navController = navController,
+                    readingId = readingId,
+                    subTopicId = subTopicId
+                )
+            } else {
+                navController.popBackStack()
+            }
+        }
+
+        composable(
+            route = Screen.StoryScreen.route,
+            arguments = listOf(
+                navArgument("readingId") { type = NavType.StringType },
+                navArgument("subTopicId") { type = NavType.StringType },
+                navArgument("storyId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val readingId = backStackEntry.arguments?.getString("readingId")
+            val subTopicId = backStackEntry.arguments?.getString("subTopicId")
+            val storyId = backStackEntry.arguments?.getString("storyId")
+
+            if (readingId != null && subTopicId != null && storyId != null) {
+                StoryScreen(
+                    navController = navController,
+                    readingId = readingId,
+                    subTopicId = subTopicId,
+                    storyId = storyId
+                )
+            } else {
+                navController.popBackStack()
+            }
+        }
+
     }
 }

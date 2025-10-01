@@ -2,7 +2,12 @@
 
 ## 📱 Giới thiệu
 
-**3000 từ vựng Oxford** là ứng dụng học từ vựng tiếng Anh dành cho Android, được phát triển bằng **Kotlin Jetpack Compose** trên nền tảng. Ứng dụng tập trung vào việc giúp người dùng xây dựng nền tảng vững chắc với 3000 từ vựng cốt lõi theo chuẩn Oxford đáng tin cậy. Mục tiêu của ứng dụng là mang đến trải nghiệm học tập thân thiện, linh hoạt và hiệu quả nhất. Người dùng có thể chuyển đổi Theme Sáng/Tối để bảo vệ mắt. Hãy tải ứng dụng và bắt đầu hành trình làm chủ từ vựng tiếng Anh một cách chủ động ngay hôm nay!
+**3000 từ vựng Oxford** là ứng dụng học từ vựng tiếng Anh dành cho Android, được phát triển bằng *
+*Kotlin Jetpack Compose** trên nền tảng. Ứng dụng tập trung vào việc giúp người dùng xây dựng nền
+tảng vững chắc với 3000 từ vựng cốt lõi theo chuẩn Oxford đáng tin cậy. Mục tiêu của ứng dụng là
+mang đến trải nghiệm học tập thân thiện, linh hoạt và hiệu quả nhất. Người dùng có thể chuyển đổi
+Theme Sáng/Tối để bảo vệ mắt. Hãy tải ứng dụng và bắt đầu hành trình làm chủ từ vựng tiếng Anh một
+cách chủ động ngay hôm nay!
 
 ## 📸 Ảnh chụp giao diện ứng dụng
 
@@ -13,9 +18,9 @@
     <td>Tìm kiếm</td>
   </tr>
   <tr>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158101.png" width="100%"></td>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158112.png" width="100%"></td>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158147.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306884.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306890.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306902.png" width="100%"></td>
   </tr>
   <tr>
     <td colspan="3"></td>
@@ -26,31 +31,44 @@
     <td>Từ vựng theo chủ đề</td>
   </tr>
   <tr>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158157.png" width="100%"></td>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158165.png" width="100%"></td>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158214.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306920.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306926.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306943.png" width="100%"></td>
   </tr>
   <tr>
     <td colspan="3"></td>
   </tr>
   <tr>
-    <td>Chế độ nền tối</td>
+    <td>Nghĩa của từ</td>
+    <td>Danh sách bài đọc</td>
+    <td>Danh sách bài đọc</td>
+  </tr>
+  <tr>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306953.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306962.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306971.png" width="100%"></td>
+  </tr>
+  <tr>
+    <td colspan="3"></td>
+  </tr>
+  <tr>
+    <td>Luyện đọc</td>
     <td>Chế độ nền tối</td>
     <td>Chế độ nền tối</td>
   </tr>
   <tr>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158226.png" width="100%"></td>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158255.png" width="100%"></td>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158259.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759306992.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759307002.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759307004.png" width="100%"></td>
   </tr>
-  <tr>
+<tr>
     <td colspan="1"></td>
   </tr>
   <tr>
     <td>Chế độ nền tối</td>
   </tr>
   <tr>
-    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759158262.png" width="100%"></td>
+    <td><img src="app/src/main/res/drawable/screenshots/Screenshot_1759307034.png" width="100%"></td>
   </tr>
   </table>
 
@@ -58,6 +76,7 @@
 
 - Học từ vựng với 3000 từ vựng chuẩn theo Oxford
 - Nghe cách đọc
+- Luyện đọc qua các câu truyện
 - Học theo chủ đề
 - Tìm kiếm từ vựng
 - Thay đổi chế độ sáng/tối để phù hợp với ánh sáng xung quanh
